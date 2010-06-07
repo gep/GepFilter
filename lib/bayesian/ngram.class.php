@@ -24,9 +24,9 @@
 *   OTHER DEALINGS IN THE SOFTWARE.                                       *
 ***************************************************************************
 */ 
-if (defined("NGRAM_CLASS") ) return true;
-
-define("NGRAM_CLASS",true);
+//if (defined("NGRAM_CLASS") ) return true;
+//
+//define("NGRAM_CLASS",true);
 
 class ngram {
 
@@ -76,7 +76,7 @@ class ngram {
                 /** 
                  *    The last caracter weren't accumulated, so decrement
                  *    the counter and in the next itineration it will be 
-                 *    hanled.
+                 *    handled.
                  */
                 $i--;
             }
@@ -90,7 +90,7 @@ class ngram {
 	
 	protected function useful($f) {
 	    $f = strtolower($f);
-	    return ($f >= 'a' && $f <= 'z') || $this->is_space($f);
+	    return ($f >= 'a' && $f <= 'z') || ($f >= 'а' && $f <= 'я') || $this->is_space($f);
 	}
 }
 

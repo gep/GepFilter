@@ -24,9 +24,9 @@
 *   OTHER DEALINGS IN THE SOFTWARE.                                       *
 ***************************************************************************
 */ 
-if (defined("TRAINER_CLASS") ) return true;
-define("TRAINER_CLASS",true);
-require(dirname(__FILE__)."/ngram.php");
+//if (defined("TRAINER_CLASS") ) return true;
+//define("TRAINER_CLASS",true);
+//require(dirname(__FILE__)."/ngram.php");
 
 /**
  *    This class "laern" about what is spam and what is not
@@ -68,18 +68,22 @@ class trainer {
                 }
             }
  
-            $actual = & $this->knowledge[$tipo];
+            $this->knowledge[$tipo] = (isset($this->knowledge[$tipo]) ? $this->knowledge[$tipo] : array());
             foreach( $this->ngram->getnGrams() as $k => $v) {
-                $actual[$k]['cant'] = $v;
+                $this->knowledge[$tipo][$k]['cant'] = $v;
                 $params[$tipo] += $v;
             }
         }
         $this->computeBayesianFiltering($params);
     }
     
+    
+    public function getKnowledge(){
+    	return $this->knowledge;
+    }
+    
     public function computeBayesianFiltering($param) {
         //print_r($param);
-        //
         foreach($this->knowledge as $tipo => $caracterist) {
             foreach($caracterist as $k => $v) {
                  $t = ($v['cant']/$param[$tipo]);
@@ -93,5 +97,8 @@ class trainer {
             }
         }
     }
+    
+    
+    
 }
 ?>

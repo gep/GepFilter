@@ -1,0 +1,49 @@
+Example:
+  actAs:  
+    Timestampable:
+      created:
+        name: created_at
+        type: timestamp
+      updated:
+        disabled: true 
+  columns:
+    content:
+      type: clob
+    state:
+      type: enum
+      notnull: on
+      values:
+        - 0
+        - 1
+        - spam
+      default:  1
+      
+      
+      
+KnowledgeBase:
+  actAs:  
+    Timestampable:
+      created:
+        name: created_at
+        type: timestamp
+      updated:
+        disabled: true 
+  columns:
+    ngram:
+      type: string(10)
+      notnull: on
+      primary: yes
+    belongs:
+      type: string(10)
+      notnull: on
+      primary: yes
+    repite:
+      type: integer
+      notnull: on
+    percent:
+      type: float
+      notnull: on
+  indexes:
+    viewer_viewed:
+      fields: [repite]
+  

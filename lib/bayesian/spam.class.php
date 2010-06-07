@@ -24,10 +24,10 @@
 *   OTHER DEALINGS IN THE SOFTWARE.                                       *
 ***************************************************************************
 */ 
-if (defined("SPAM_CLASS") ) return true;
-define("SPAM_CLASS",true);
-
-require(dirname(__FILE__)."/ngram.php");
+//if (defined("SPAM_CLASS") ) return true;
+//define("SPAM_CLASS",true);
+//
+//require(dirname(__FILE__)."/ngram.php");
 
 
 class spam {
@@ -41,10 +41,10 @@ class spam {
      *  @param string $Callback Function name
      */
     public function __construct($callback='') {
-        if ( !is_callable($callback) ) {
-            trigger_error("$callback is not a valid funciton",E_USER_ERROR);
-        }
-        $this->_source = $callback;
+//        if ( !is_callable($callback) ) {
+//            trigger_error("$callback is not a valid funciton",E_USER_ERROR);
+//        }
+//        $this->_source = $callback;
     }
     
     /**
@@ -90,9 +90,10 @@ class spam {
             $ngram->extract();
         }
         
-        $fnc = $this->_source;
+//        $fnc = $this->_source;
         $ngrams =  $ngram->getnGrams();
-        $knowledge =  $fnc( $ngrams,$type );
+//        $knowledge =  $fnc( $ngrams,$type );
+        $knowledge =  $this->getNgramsFromDB( $ngrams,$type );
         $total=0;
         $acc=0;
         
@@ -120,6 +121,37 @@ class spam {
         $S = (float)$this->chi2Q( -2 * log( $N *  $S), 2 * $N);
         $percent = (( 1 + $H - $S ) / 2) * 100;
         return is_finite($percent) ? $percent : 100;
+    }
+    
+    /**
+	 *  Callback function
+	 *
+	 *  This is function is called by the classifier class, and it must 
+	 *  return all the n-grams.
+	 *  
+	 *  @param Array $ngrams N-grams.
+	 *  @param String $type Type of set to compare
+	 */
+    public function getNgramsFromDB($ngrams, $type){
+	    
+	    $info = array_keys($ngrams);
+	    
+	    $q = Doctrine::getTable('KnowledgeBase')->createQuery('kb')->where('kb.belongs = ?', $type)
+	    													  ->andWhereIn('kb.ngram', $info);
+//	    $sql = "select ngram,percent from knowledge_base where belongs = '$type' && ngram in ('".implode("','",$info)."')";
+//	    $r = mysql_query($sql,$db);
+//	    
+//	    while ( $row = mysql_fetch_array($r) ) {
+//	        $t[ $row['ngram'] ]  = $row['percent'];     
+//	    }
+	    
+	    foreach ($q->fetchArray() as $item){
+	    	$t[ $item['ngram'] ]  = $item['percent'];
+	    }
+	    
+	    $q->free();
+	
+	    return $t;
     }
     
     public function chi2Q( $x,  $v) {

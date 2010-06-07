@@ -30,7 +30,7 @@ ini_set('memory_limit','64M');
 require("config.php");
 require("../trainer.php");
 
-$trainer = new trainer;
+$trainer = new trainer();
 
 
 $db = mysql_connect(MYSQL_HOST,MYSQL_USER,MYSQL_PASS);
