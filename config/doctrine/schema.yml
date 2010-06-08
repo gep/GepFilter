@@ -1,3 +1,7 @@
+options:
+  collation: utf8
+  charset: utf8
+
 Example:
   actAs:  
     Timestampable:

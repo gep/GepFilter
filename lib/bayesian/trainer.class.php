@@ -70,8 +70,8 @@ class trainer {
  
             $this->knowledge[$tipo] = (isset($this->knowledge[$tipo]) ? $this->knowledge[$tipo] : array());
             foreach( $this->ngram->getnGrams() as $k => $v) {
-                $this->knowledge[$tipo][$k]['cant'] = $v;
-                $params[$tipo] += $v;
+                $this->knowledge[$tipo][$k] = array ('cant' => $v['weight'], 'ngram' => $v['ngram']);
+                $params[$tipo] += $v['weight'];
             }
         }
         $this->computeBayesianFiltering($params);
@@ -82,6 +82,11 @@ class trainer {
     	return $this->knowledge;
     }
     
+    
+    /**
+     * compute bayesian probability
+     * @param $param
+     */
     public function computeBayesianFiltering($param) {
         //print_r($param);
         foreach($this->knowledge as $tipo => $caracterist) {

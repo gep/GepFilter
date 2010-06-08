@@ -41,10 +41,7 @@ class spam {
      *  @param string $Callback Function name
      */
     public function __construct($callback='') {
-//        if ( !is_callable($callback) ) {
-//            trigger_error("$callback is not a valid funciton",E_USER_ERROR);
-//        }
-//        $this->_source = $callback;
+
     }
     
     /**
@@ -90,9 +87,8 @@ class spam {
             $ngram->extract();
         }
         
-//        $fnc = $this->_source;
         $ngrams =  $ngram->getnGrams();
-//        $knowledge =  $fnc( $ngrams,$type );
+
         $knowledge =  $this->getNgramsFromDB( $ngrams,$type );
         $total=0;
         $acc=0;
@@ -110,9 +106,10 @@ class spam {
         $H = $S = 1;
         
         foreach($ngrams as $k => $v) {
-            if ( !isset($knowledge[$k]) ) continue;
+        	if ($index = ngram::staticCheckIfValueExists($knowledge, $v['ngram']) !== false) continue;
+//            if ( !isset($knowledge[$k]) ) continue;
             $N++;
-            $value = $knowledge[$k] * $v; 
+            $value = $knowledge[$index]['percent'] * $v['weight']; 
             $H *= $value;
             $S *= (float)( 1 - ( ($value>=1) ? 0.99 : $value) );
         }
@@ -124,7 +121,7 @@ class spam {
     }
     
     /**
-	 *  Callback function
+	 *  get ngrams
 	 *
 	 *  This is function is called by the classifier class, and it must 
 	 *  return all the n-grams.
@@ -134,19 +131,19 @@ class spam {
 	 */
     public function getNgramsFromDB($ngrams, $type){
 	    
-	    $info = array_keys($ngrams);
+//    	var_dump($ngrams); exit;
+    	
+    	$info = array();
+    	foreach ($ngrams as $ngram){
+    		$info[] = $ngram['ngram'];
+    	}
+    	
 	    
 	    $q = Doctrine::getTable('KnowledgeBase')->createQuery('kb')->where('kb.belongs = ?', $type)
 	    													  ->andWhereIn('kb.ngram', $info);
-//	    $sql = "select ngram,percent from knowledge_base where belongs = '$type' && ngram in ('".implode("','",$info)."')";
-//	    $r = mysql_query($sql,$db);
-//	    
-//	    while ( $row = mysql_fetch_array($r) ) {
-//	        $t[ $row['ngram'] ]  = $row['percent'];     
-//	    }
 	    
 	    foreach ($q->fetchArray() as $item){
-	    	$t[ $item['ngram'] ]  = $item['percent'];
+	    	$t[]  = array('ngram' => $item['ngram'], 'percent' => $item['percent']);
 	    }
 	    
 	    $q->free();

@@ -8,3 +8,7 @@ all:
       dsn:      'pgsql:host=localhost;dbname=filter'
       username: gep
       password: qwe
+      attributes:
+        default_table_charset: utf8
+        default_table_collate: utf8_general_ci
+      

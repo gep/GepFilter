@@ -37,6 +37,9 @@ abstract class BaseExample extends sfDoctrineRecord
              ),
              'default' => 1,
              ));
+
+        $this->option('collation', 'utf8');
+        $this->option('charset', 'utf8');
     }
 
     public function setUp()

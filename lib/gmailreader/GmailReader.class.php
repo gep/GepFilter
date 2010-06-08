@@ -23,13 +23,13 @@
    }
 
    public function openSpamEmail(){
-   	imap_reopen($this->mbox, "{imap.gmail.com:993/imap/ssl}[Gmail]/Spam Mail" )  
+   	imap_reopen($this->mbox, "{imap.gmail.com:993/imap/ssl}[Gmail]/Spam" )  
      or die("Failed to open Spam Mail: " . imap_last_error()); 
    }
    
    
    public function openInboxEmail(){
-   	imap_reopen($this->mbox, "{imap.gmail.com:993/imap/ssl}[Gmail]/Inbox Mail" )  
+   	imap_reopen($this->mbox, "{imap.gmail.com:993/imap/ssl}INBOX" )  
      or die("Failed to open Spam Mail: " . imap_last_error()); 
    }
      
@@ -78,10 +78,13 @@
      $messages = array();  
      foreach( $uids as $k=>$uid )  
      {  
-      $messages[] = $this->retrieve_message($uid);  
+      $messages[] = $this->retrieve_message($uid);
+      echo 'Proceeded email: '.$k. "<br /> \n"; flush();  
      }  
      return $messages;  
-    }  
+    }
+
+    
       
     public function getMessageIdsSinceDate($date)  
     {  
@@ -98,7 +101,7 @@
        $message['subject'] = $header->subject; 
        $message['fromaddress'] =   $header->fromaddress; 
        $message['toaddress'] =   $header->toaddress;  
-       $message['ccaddress'] =   $header->ccaddress; 
+//       $message['ccaddress'] =   $header->ccaddress; 
        $message['date'] =   $header->date; 
      
        return $message; 
@@ -110,22 +113,37 @@
      
        $header = imap_header($this->mbox, $messageid); 
        $structure = imap_fetchstructure($this->mbox, $messageid); 
+       
+//       var_dump($structure); 
+       
      
        $message['subject'] = $header->subject;  
        $message['fromaddress'] =   $header->fromaddress; 
        $message['toaddress'] =   $header->toaddress;  
-       $message['ccaddress'] =   $header->ccaddress; 
+//       $message['ccaddress'] =   $header->ccaddress; 
        $message['date'] =   $header->date; 
     
      if ($this->check_type($structure)) 
-     { 
-      $message['body'] = imap_fetchbody($this->mbox,$messageid,"1"); ## GET THE BODY OF MULTI-PART MESSAGE 
-      if(!$message['body']) {$message['body'] = '[NO TEXT ENTERED INTO THE MESSAGE]nn';} 
+     {
+//		$text = str_replace('&', '+', imap_fetchbody($this->mbox,$messageid,"1"));
+//		$text  = str_replace(',', '/', $text);
+//      $text = imap_fetchbody($this->mbox,$messageid,"2");
+//      $enc = mb_detect_encoding($text);
+//      echo $enc.'<br />';
+//      $message['body'] = iconv('KOI8-R', 'UTF-8', $text); ## GET THE BODY OF MULTI-PART MESSAGE
+		if(is_array($structure->parts) && is_array($structure->parts[0]->parameters) && $structure->parts[0]->parameters[0]->attribute == 'CHARSET' && in_array(strtolower($structure->parts[0]->parameters[0]->value), array('utf-8', 'windows-1251'))){
+			$message['body'] = base64_decode(imap_fetchbody($this->mbox,$messageid,"1"));
+		}else{
+			
+			$message['body'] = imap_fetchbody($this->mbox,$messageid,"1");
+		}
+      if(!$message['body']) {$message['body'] = '';} 
      } 
      else 
      { 
-      $message['body'] = imap_body($this->mbox, $messageid); 
-      if(!$message['body']) {$message['body'] = '[NO TEXT ENTERED INTO THE MESSAGE]nn';}  
+//      $message['body'] = iconv('KOI8-R', 'UTF-8', imap_body($this->mbox, $messageid));
+		$message['body'] = imap_body($this->mbox, $messageid);
+      if(!$message['body']) {$message['body'] = '';}  
      }  
      
      return $message;  

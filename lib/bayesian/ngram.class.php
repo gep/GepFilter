@@ -37,14 +37,28 @@ class ngram {
         $this->setLength($letter);
     }
     
+    /**
+     * set ngram length
+     * @param $length
+     */
     public function setLength($length=1){
         $this->length=$length;
     }
     
+    
+    /**
+     * set text
+     * @param string $text
+     */
     public function setText($text) {
         $this->text =" ".$text."  ";
     }
     
+    
+    /**
+     * set initial ngram
+     * @param $arg
+     */
     public function setInitialNgram($arg) {
         $this->ngrams = $arg;
     }
@@ -57,6 +71,7 @@ class ngram {
         $len = strlen($this->text);
         $buf='';
         $ultimo='';
+        
         for($i=0; $i < $len; $i++) {
             if ( strlen($buf) < $this->length) {
                 if ( !$this->useful($this->text[$i]) ) 
@@ -66,20 +81,24 @@ class ngram {
                      continue;
                     
                 $buf .= $this->is_space($this->text[$i]) ? '_' : $this->text[$i];
+                
                 $ultimo = $this->text[$i];
             } else {
+            	
                 $buf = strtolower($buf);
                 $buf = str_replace(" ","_",$buf);
-                $this->ngrams[$buf] = isset($this->ngrams[$buf]) ? $this->ngrams[$buf] + 1 : 1;
-                $ultimo='';
+                if (($index = $this->checkIfValueExists($buf)) !== false){ 
+                	$this->ngrams[$index]['weight']++;
+                }else{
+                	$this->ngrams[] = array('weight' => 1, 'ngram' => $buf);
+                }
+                $ultimo = '';
                 $buf = '';
-                /** 
-                 *    The last caracter weren't accumulated, so decrement
-                 *    the counter and in the next itineration it will be 
-                 *    handled.
-                 */
+
                 $i--;
+                
             }
+            
         }
     }
     
@@ -91,6 +110,27 @@ class ngram {
 	protected function useful($f) {
 	    $f = strtolower($f);
 	    return ($f >= 'a' && $f <= 'z') || ($f >= 'а' && $f <= 'я') || $this->is_space($f);
+	}
+	
+	
+	protected function checkIfValueExists($buff){
+		if (empty($this->ngrams)) return false;
+		foreach ($this->ngrams as $k => $val){
+			if ($val['ngram'] == $buff){
+				return $k;
+			}
+		}
+		return false;
+	}
+	
+	
+	public static function staticCheckIfValueExists($ar, $buff){
+		foreach ($ar as $k => $val){
+			if ($val['ngram'] == $buff){
+				return $k;
+			}
+		}
+		return false;
 	}
 }
 

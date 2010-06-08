@@ -55,6 +55,8 @@ abstract class BaseKnowledgeBase extends sfDoctrineRecord
               0 => 'repite',
              ),
              ));
+        $this->option('collation', 'utf8');
+        $this->option('charset', 'utf8');
     }
 
     public function setUp()
