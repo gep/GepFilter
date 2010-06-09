@@ -30,7 +30,7 @@
 //require(dirname(__FILE__)."/ngram.php");
 
 
-class spam {
+class spamOrigin {
     protected $_source;
     /**
      *  Constructor
@@ -41,7 +41,10 @@ class spam {
      *  @param string $Callback Function name
      */
     public function __construct($callback='') {
-
+//        if ( !is_callable($callback) ) {
+//            trigger_error("$callback is not a valid funciton",E_USER_ERROR);
+//        }
+//        $this->_source = $callback;
     }
     
     /**
@@ -52,7 +55,7 @@ class spam {
      *    @return true
      */
     public function isItSpam($text,$type) {
-        $ngram = new ngram;
+        $ngram = new ngramOrigin();
         $ngram->setText($text);
         
         for($i=3; $i <= 5;$i++) {
@@ -60,9 +63,9 @@ class spam {
             $ngram->extract();
         }
         
-        $fnc = $this->_source;
+//        $fnc = $this->_source;
         $ngrams =  $ngram->getnGrams();
-        $knowledge =  $fnc( $ngrams,$type );
+        $knowledge =  $this->getNgramsFromDB( $ngrams,$type );
         $total=0;
         $acc=0;
         foreach($ngrams as $k => $v) {
@@ -79,7 +82,7 @@ class spam {
    
     
     public function isItSpam_v2($text,$type) {
-        $ngram = new ngram;
+        $ngram = new ngramOrigin();
         $ngram->setText($text);
         
         for($i=3; $i <= 5;$i++) {
@@ -88,7 +91,6 @@ class spam {
         }
         
         $ngrams =  $ngram->getnGrams();
-
         $knowledge =  $this->getNgramsFromDB( $ngrams,$type );
         $total=0;
         $acc=0;
@@ -105,12 +107,10 @@ class spam {
         $N = 0;
         $H = $S = 1;
         
-//        var_dump($ngrams); exit;
         foreach($ngrams as $k => $v) {
-        	if (($index = ngram::staticCheckIfValueExists($knowledge, $v['ngram'])) === false) continue;
-//            if ( !isset($knowledge[$k]) ) continue;
+            if ( !isset($knowledge[$k]) ) continue;
             $N++;
-            $value = $knowledge[$index]['percent'] * $v['weight']; 
+            $value = $knowledge[$k] * $v; 
             $H *= $value;
             $S *= (float)( 1 - ( ($value>=1) ? 0.99 : $value) );
         }
@@ -120,6 +120,7 @@ class spam {
         $percent = (( 1 + $H - $S ) / 2) * 100;
         return is_finite($percent) ? $percent : 100;
     }
+    
     
     /**
 	 *  get ngrams
@@ -134,17 +135,13 @@ class spam {
 	    
 //    	var_dump($ngrams); exit;
     	
-    	$info = array();
-    	foreach ($ngrams as $ngram){
-    		$info[] = $ngram['ngram'];
-    	}
-    	
+    	$info = array_keys($ngrams);
 	    
 	    $q = Doctrine::getTable('KnowledgeBase')->createQuery('kb')->where('kb.belongs = ?', $type)
 	    													  ->andWhereIn('kb.ngram', $info);
 	    
 	    foreach ($q->fetchArray() as $item){
-	    	$t[]  = array('ngram' => $item['ngram'], 'percent' => $item['percent']);
+	    	$t[$item['ngram']]  = $item['percent'];
 	    }
 	    
 	    $q->free();
@@ -152,7 +149,7 @@ class spam {
 	    return $t;
     }
     
-    public function chi2Q( $x,  $v) {
+    protected function chi2Q( $x,  $v) {
         $m = (double)$x / 2.0;
         $s = exp(-$m);
         $t = $s;

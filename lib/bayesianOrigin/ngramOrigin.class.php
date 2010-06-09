@@ -28,7 +28,7 @@
 //
 //define("NGRAM_CLASS",true);
 
-class ngram {
+class ngramOrigin {
 
     protected $text;
     protected $length;
@@ -37,28 +37,14 @@ class ngram {
         $this->setLength($letter);
     }
     
-    /**
-     * set ngram length
-     * @param $length
-     */
     public function setLength($length=1){
         $this->length=$length;
     }
     
-    
-    /**
-     * set text
-     * @param string $text
-     */
     public function setText($text) {
         $this->text =" ".$text."  ";
     }
     
-    
-    /**
-     * set initial ngram
-     * @param $arg
-     */
     public function setInitialNgram($arg) {
         $this->ngrams = $arg;
     }
@@ -68,70 +54,45 @@ class ngram {
     }
     
     public function extract() {
-        $len = strlen($this->text);
+        $txt = & $this->text;
+        $len = strlen($txt);
+        $length = & $this->length;
+        $ngrams = & $this->ngrams;
         $buf='';
         $ultimo='';
-        
         for($i=0; $i < $len; $i++) {
-            if ( strlen($buf) < $this->length) {
-                if ( !$this->useful($this->text[$i]) ) 
+            if ( strlen($buf) < $length) {
+                if ( !$this->useful($txt[$i]) ) 
                     continue;
                     
-                if ($this->is_space($this->text[$i]) && $this->is_space($ultimo))
+                if ($this->is_space($txt[$i]) && $this->is_space($ultimo))
                      continue;
                     
-                $buf .= $this->is_space($this->text[$i]) ? '_' : $this->text[$i];
-                
-                $ultimo = $this->text[$i];
+                $buf .= $this->is_space($txt[$i]) ? '_' : $txt[$i];
+                $ultimo = $txt[$i];
             } else {
-            	
                 $buf = strtolower($buf);
                 $buf = str_replace(" ","_",$buf);
-                if (($index = $this->checkIfValueExists($buf)) !== false){ 
-                	$this->ngrams[$index]['weight'] += 1;
-                }else{
-                	$this->ngrams[] = array('weight' => 1, 'ngram' => $buf);
-                }
-                $ultimo = '';
+                $ngrams[$buf] = isset($ngrams[$buf]) ? $ngrams[$buf] + 1 : 1;
+                $ultimo='';
                 $buf = '';
-
+                /** 
+                 *    The last caracter weren't accumulated, so decrement
+                 *    the counter and in the next itineration it will be 
+                 *    hanled.
+                 */
                 $i--;
-                
             }
-            
         }
     }
     
-    protected function is_space($f) {
-    	return $f==' ' || $f=="\n" || $f=="\r" || $f=="\t";
+	public function is_space($f) {
+	    return $f==' ' || $f=="\n" || $f=="\r" || $f=="\t";
 	}
-	
-	
-	protected function useful($f) {
+	public function useful($f) {
 	    $f = strtolower($f);
-	    return ($f >= 'a' && $f <= 'z') || ($f >= 'а' && $f <= 'я') || $this->is_space($f);
-	}
-	
-	
-	protected function checkIfValueExists($buff){
-		if (empty($this->ngrams)) return false;
-		foreach ($this->ngrams as $k => $val){
-			if ($val['ngram'] == $buff){
-				return $k;
-			}
-		}
-		return false;
-	}
-	
-	
-	public static function staticCheckIfValueExists($ar, $buff){
-		foreach ($ar as $k => $val){
-			if ($val['ngram'] == $buff){
-				return $k;
-			}
-		}
-		return false;
-	}
+	    return ($f >= 'a' && $f <= 'z') || $this->is_space($f);
+}
 }
 
 
