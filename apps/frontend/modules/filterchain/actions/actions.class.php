@@ -102,17 +102,22 @@ class filterchainActions extends sfActions
   
   
   public function executeCheckMessage(sfWebRequest $request){
-	$spam = new spam();
+	$this->spam = new spam();
 	/**/
-	$texts = array("Phentermine", "Buy cheap xxx","Really nice post","Viagra",);
-	echo "<h1>Тест проверки на спам</h1>";
-	foreach ($texts as $text)
-	    echo "<em><strong>$text</strong></em> вероятность <b>". $spam->isItSpam_v2($text,'spam')."%</b> spam<hr>";
-	echo "<h1>Тест проверки на не спам</h1>";
-	foreach ($texts as $text)
-	    echo "<em><strong>$text</strong></em> вероятность <b>". $spam->isItSpam_v2($text,'1')."%</b> not spam<hr>";;
-	
-	return sfView::NONE;
+	$this->texts = array("Polar night", 
+						 "Phentermine", 
+						 "Buy cheap xxx",
+						 "Really nice post",
+						 "Viagra", 
+						 "Via");
+//	echo "<h1>Тест проверки на спам</h1>";
+//	foreach ($texts as $text)
+//	    echo "<em><strong>$text</strong></em> вероятность <b>". $spam->isItSpam_v2($text,'spam')."%</b> spam<hr>";
+//	echo "<h1>Тест проверки на не спам</h1>";
+//	foreach ($texts as $text)
+//	    echo "<em><strong>$text</strong></em> вероятность <b>". $spam->isItSpam_v2($text,'1')."%</b> not spam<hr>";;
+//	
+//	return sfView::NONE;
   }
   
   
@@ -126,6 +131,11 @@ class filterchainActions extends sfActions
   	$gmailReader->getEmailSinceAndAddToDB('1 Sep 2009 9:00:00', '1');
 
 	return sfView::NONE;
+  }
+  
+  
+  public function executeTestPage(){
+  	$this->setTemplate('index');
   }
 
 }

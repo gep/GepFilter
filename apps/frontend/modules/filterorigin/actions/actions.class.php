@@ -97,7 +97,13 @@ class filteroriginActions extends sfActions
   	
   	$spam = new spamOrigin();
 	/**/
-	$texts = array("Phentermine", "Buy cheap xxx","Really nice post","Viagra", "cialis", "Paris Hilton", );
+	$texts = array("Phentermine", 
+				   "Buy cheap xxx",
+				   "Really nice post",
+				   "Viagra", 
+				   "cialis", 
+				   "Paris Hilton", 
+				   "Diploma");
 	echo "<h1>Spam test</h1>";
 	foreach ($texts as $text)
 	    echo "<em><strong>$text</strong></em> has an accuraccy of <b>". $spam->isItSpam_v2($text,'spam')."%</b> spam<hr>";
