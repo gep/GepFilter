@@ -1,0 +1,1 @@
+﻿create index gin_content_index1 on example using gin(to_tsvector('english', content));
