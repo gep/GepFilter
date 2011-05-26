@@ -50,4 +50,70 @@ KnowledgeBase:
   indexes:
     viewer_viewed:
       fields: [repite]
-  
+      
+      
+Lexeme:
+  actAs:  
+    Timestampable:
+      created:
+        name: created_at
+        type: timestamp
+      updated:
+        name: updated_at
+        type: timestamp
+  columns:
+    lexeme_item:
+      type: string(10)
+      notnull: on
+      primary: yes
+    belongs:
+      type: enum
+      values: [spam, ham]
+      notnull: true
+      primary: yes
+    repite:
+      type: integer
+      notnull: on
+    percent:
+      type: float
+      notnull: on
+  indexes:
+    viewer_viewed_index:
+      fields: [repite]
+      
+      
+SpamStatView:
+  columns:
+    word:
+      type: text
+      primary: yes
+    ndoc:
+      type: integer
+    nentry:
+      type: integer
+   
+   
+   
+HamStatView:
+  columns:
+    word:
+      type: text
+      primary: yes
+    ndoc:
+      type: integer
+    nentry:
+      type: integer
+      
+      
+ConcatView:
+  columns:
+    word1:
+      type: text
+      primary: yes
+    ndoc1:
+      type: integer
+    nentry1:
+      type: integer
+    is_spam:
+      type: integer(1)
+      primary: yes
