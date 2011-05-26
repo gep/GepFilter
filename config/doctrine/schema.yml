@@ -63,7 +63,7 @@ Lexeme:
         type: timestamp
   columns:
     lexeme_item:
-      type: string(10)
+      type: text
       notnull: on
       primary: yes
     belongs:
@@ -117,3 +117,22 @@ ConcatView:
     is_spam:
       type: integer(1)
       primary: yes
+      
+
+TableConcatView:
+  columns:
+    word1:
+      type: text
+      primary: yes
+    ndoc1:
+      type: integer
+    nentry1:
+      type: integer
+    is_spam:
+      type: integer(1)
+      primary: yes
+  indexes:
+    word1_index:
+      fields: [word1]
+    is_spam_index:
+      fields: [is_spam]
